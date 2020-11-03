@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import json
+import json, os
 from datetime import datetime
 
 config_read       = open("config.json", "r")
@@ -18,10 +18,14 @@ bot = commands.Bot(
 )
 bot.load_extension('jishaku')
 
+for x in os.listdir('cogs'):
+    if x.endswith(".py"):
+        bot.load_extension("cogs." + x[:-3])
+
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="over ArtiFeZ"))
-    print(f"Logged in as {bot.user.display_name + '#' + bot.user.discriminator}!")
+    print(f"Logged in as {str(bot.user)}!")
     print(f"ArtiFeZ members: {len(bot.users)}")
     print(f"Average latency: {round(int(bot.latency * 1000))}ms")
 

@@ -130,3 +130,6 @@ dmypy.json
 
 # Cofig file
 config.json
+
+# idea
+.idea
