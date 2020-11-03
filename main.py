@@ -24,8 +24,8 @@ async def on_ready():
     print(f"ArtiFeZ members: {len(bot.users)}")
     print(f"Average latency: {round(int(bot.latency * 1000))}ms")
 
-@bot.command(name="test", help="shows the latency of the bot, not yours.")
-async def test(ctx : commands.Context):
+@bot.command(name="ping", help="shows the latency of the bot, not yours.")
+async def ping(ctx : commands.Context):
     e = discord.Embed(
         title="🏓  Ping!",
         description=f"Bot's Average Latency: **{round(int(bot.latency * 1000))}ms**"
