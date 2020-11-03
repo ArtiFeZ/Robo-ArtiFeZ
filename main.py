@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import json
+from datetime import datetime
 
 config_read       = open("config.json", "r")
 config            = json.load(config_read)
@@ -8,7 +9,7 @@ token             = config['token']
 intents           = discord.Intents.all()
 intents.presences = True
 intents.members   = True
-main_color        = 0x00000000
+main_color        = 0x18adff
 ArtiFeZ_guild_id  = 715126942294343700
 
 bot = commands.Bot(
@@ -26,11 +27,16 @@ async def on_ready():
 
 @bot.command(name="ping", help="shows the latency of the bot, not yours.")
 async def ping(ctx : commands.Context):
+    x = datetime.utcnow() - ctx.message.created_at
+    responseTime = round(x.microseconds / 1000)
+    wsLatency = round(int(bot.latency * 1000))
     e = discord.Embed(
-        title="🏓  Ping!",
-        description=f"Bot's Average Latency: **{round(int(bot.latency * 1000))}ms**"
+        title="🏓  Pong!",
+        description=f"Websocket Latency: **{wsLatency}ms**\n"
+                    f"Response Time: **{responseTime}ms**",
+        color=main_color
     )
-    e.set_footer(text="Robo-ArtiFeZ 🤖", icon_url=bot.user.icon_url)
+    e.set_footer(text=bot.user.name, icon_url=bot.user.avatar_url)
     await ctx.send(embed=e)
     # await ctx.send("works!")
     return
