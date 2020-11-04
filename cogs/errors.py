@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord import *
+import discord
 from main import main_color
 
 def setup(client):
@@ -15,7 +15,7 @@ class errors(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             return
         elif isinstance(error, commands.MissingRole):
-            return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command requires the {', '.join(f'`{x}`' for x in error.missing_role)} role{'s' if len(error.missing_role) != 1 else ''}."))
+            return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command requires the Moderator role."))
         elif isinstance(error, commands.NoPrivateMessage):
             return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command cannot be used in private messages."))
         else:
