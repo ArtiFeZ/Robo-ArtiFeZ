@@ -26,7 +26,7 @@ class moderation(commands.Cog):
         unmute_at = int(data['unmute_at'])
         timestr = rdTime.getReadableTimeBetween(muted_at, unmute_at)
         embed = discord.Embed(
-            title="Member Unmuted",
+            #title="Member Unmuted",
             color=main_color,
         )
         embed.add_field(
@@ -63,7 +63,7 @@ class moderation(commands.Cog):
         unmute_at = int(data['unmute_at'])
         timestr = rdTime.getReadableTimeBetween(muted_at, unmute_at)
         embed = discord.Embed(
-            title="Member Muted",
+            #title="Member Muted",
             color=main_color,
         )
         embed.add_field(
@@ -226,9 +226,10 @@ class moderation(commands.Cog):
     @commands.Cog.listener()
     async def on_member_kick__(self, member : discord.Member, reason : str, kicked_by : discord.Member):
         channel = self.bot.get_channel(modLogsChannelId)
+        member.roles.pop(0)
         e = discord.Embed(
             color=main_color,
-            title="Member Kicked"
+            # title="Member Kicked"
         )
         e.add_field(
             name="Member kicked:",
@@ -236,7 +237,7 @@ class moderation(commands.Cog):
                   f"• **ID**: {member.id}\n"
                   f"• **Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
                   f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
-                  f"• **Roles ({len(member.roles[:1])})**: {', '.join(x.mention for x in member.roles[:1])}",
+                  f"• **Roles ({len(member.roles)})**: {', '.join(x.mention for x in member.roles)}",
             inline=False
         )
         e.add_field(
@@ -251,7 +252,7 @@ class moderation(commands.Cog):
     @commands.command(name="kick", help="Kicks the member mentioned.")
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
-    async def kick(self, ctx : commands.Context, member : discord.Member = None, reason : str = None):
+    async def kick(self, ctx : commands.Context, member : discord.Member = None, *, reason : str = None):
         if member and reason:
             await member.kick(reason=reason)
             e2 = discord.Embed(color=main_color, title=f"Successfully kicked {str(member)}")
