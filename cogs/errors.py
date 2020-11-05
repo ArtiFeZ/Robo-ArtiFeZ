@@ -18,5 +18,7 @@ class errors(commands.Cog):
             return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command requires the Moderator role."))
         elif isinstance(error, commands.NoPrivateMessage):
             return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command cannot be used in private messages."))
+        elif isinstance(error, commands.BadArgument):
+            return await ctx.send(embed=discord.Embed(color=main_color, title="Nope.", description="**" + str(error) + "**"))
         else:
             raise error

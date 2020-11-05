@@ -5,6 +5,7 @@ import datetime
 import asyncpg, re, asyncio, time
 import utils.readabletime as rdTime
 from main import main_color, muteRoleID, moderatorRoleId, ArtiFeZ_guild_id, modLogsChannelId, ArtiFeZGuildIconUrl
+from typing import *
 
 time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
 time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
@@ -349,17 +350,26 @@ class moderation(commands.Cog):
             e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
             return await ctx.send(embed=e)
 
-    @commands.command(name="Unban", help="Unbans the member mentioned.")
+    @commands.command(name="unban", help="Unbans the member mentioned.")
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
-    async def unban_(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
+    async def unban_(self, ctx: commands.Context, member: int = None, *, reason: str = None):
         if member and reason:
-            await member.unban(reason=reason)
-            e2 = discord.Embed(color=main_color, title=f"Successfully unbanned {str(member)}")
-            await ctx.send(embed=e2)
-            self.bot.dispatch("member_unban__", member=member, reason=reason, unbanned_by=ctx.author)
+            bans : tuple = await ctx.guild.bans()
+            member = await self.bot.fetch_user(member)
+            users = []
+            for i in bans:
+                users.append(i[1])
+            if member in users:
+                await ctx.guild.unban(member, reason=reason)
+                e2 = discord.Embed(color=main_color, title=f"Successfully unbanned {str(member)}")
+                await ctx.send(embed=e2)
+                return self.bot.dispatch("member_unban__", member=member, reason=reason, unbanned_by=ctx.author)
+            if member not in users:
+                e3 = discord.Embed(title=f"{str(member)} is not banned.", color=discord.Color.red())
+                return await ctx.send(embed=e3)
         if not member:
-            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
+            e = discord.Embed(title="You did not give a user's ID.", color=discord.Color.red())
             return await ctx.send(embed=e)
         elif not reason:
             e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
