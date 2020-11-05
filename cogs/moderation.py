@@ -245,6 +245,8 @@ class moderation(commands.Cog):
                   f"• **ID**: {kicked_by.id}\n"
                   f"• **Reason**: {reason}", inline=False
         )
+        e.set_footer(text="Kicked at:")
+        e.timestamp = datetime.datetime.utcnow()
         e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
         await channel.send(embed=e)
 
@@ -270,6 +272,32 @@ class moderation(commands.Cog):
                   f"• **ID**: {banned_by.id}\n"
                   f"• **Reason**: {reason}", inline=False
         )
+        e.set_footer(text="Banned at:")
+        e.timestamp = datetime.datetime.utcnow()
+        e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
+        await channel.send(embed=e)
+
+    @commands.Cog.listener()
+    async def on_member_unban__(self, member: discord.Member, reason: str, unbanned_by: discord.Member):
+        channel = self.bot.get_channel(modLogsChannelId)
+        e = discord.Embed(
+            color=main_color,
+        )
+        e.add_field(
+            name="Member unbanned:",
+            value=f"• **Name**: {member.name} - {member.mention}\n"
+                  f"• **ID**: {member.id}\n"
+                  f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}",
+            inline=False
+        )
+        e.add_field(
+            name="Unbanned by:",
+            value=f"• **Name**: {unbanned_by.name} - {unbanned_by.mention}\n"
+                  f"• **ID**: {unbanned_by.id}\n"
+                  f"• **Reason**: {reason}", inline=False
+        )
+        e.set_footer(text="Unbanned at:")
+        e.timestamp = datetime.datetime.utcnow()
         e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
         await channel.send(embed=e)
 
@@ -314,6 +342,22 @@ class moderation(commands.Cog):
             e2 = discord.Embed(color=main_color, title=f"Successfully banned {str(member)}")
             await ctx.send(embed=e2)
             self.bot.dispatch("member_ban__", member=member, reason=reason, banned_by=ctx.author)
+        if not member:
+            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
+            return await ctx.send(embed=e)
+        elif not reason:
+            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
+            return await ctx.send(embed=e)
+
+    @commands.command(name="Unban", help="Unbans the member mentioned.")
+    @commands.guild_only()
+    @commands.has_role(moderatorRoleId)
+    async def unban_(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
+        if member and reason:
+            await member.unban(reason=reason)
+            e2 = discord.Embed(color=main_color, title=f"Successfully unbanned {str(member)}")
+            await ctx.send(embed=e2)
+            self.bot.dispatch("member_unban__", member=member, reason=reason, unbanned_by=ctx.author)
         if not member:
             e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
             return await ctx.send(embed=e)
