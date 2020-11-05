@@ -226,7 +226,6 @@ class moderation(commands.Cog):
     @commands.Cog.listener()
     async def on_member_kick__(self, member : discord.Member, reason : str, kicked_by : discord.Member):
         channel = self.bot.get_channel(modLogsChannelId)
-        member.roles.pop(0)
         e = discord.Embed(
             color=main_color,
             # title="Member Kicked"
@@ -237,13 +236,38 @@ class moderation(commands.Cog):
                   f"• **ID**: {member.id}\n"
                   f"• **Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
                   f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
-                  f"• **Roles ({len(member.roles)})**: {', '.join(x.mention for x in member.roles)}",
+                  f"• **Roles ({len(member.roles[1:])})**: {', '.join(x.mention for x in member.roles[1:])}",
             inline=False
         )
         e.add_field(
             name="Kicked by:",
             value=f"• **Name**: {kicked_by.name} - {kicked_by.mention}\n"
                   f"• **ID**: {kicked_by.id}\n"
+                  f"• **Reason**: {reason}", inline=False
+        )
+        e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
+        await channel.send(embed=e)
+
+    @commands.Cog.listener()
+    async def on_member_ban__(self, member: discord.Member, reason: str, banned_by: discord.Member):
+        channel = self.bot.get_channel(modLogsChannelId)
+        e = discord.Embed(
+            color=main_color,
+            # title="Member Kicked"
+        )
+        e.add_field(
+            name="Member kicked:",
+            value=f"• **Name**: {member.name} - {member.mention}\n"
+                  f"• **ID**: {member.id}\n"
+                  f"• **Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"• **Roles ({len(member.roles[1:])})**: {', '.join(x.mention for x in member.roles[1:])}",
+            inline=False
+        )
+        e.add_field(
+            name="Banned by:",
+            value=f"• **Name**: {banned_by.name} - {banned_by.mention}\n"
+                  f"• **ID**: {banned_by.id}\n"
                   f"• **Reason**: {reason}", inline=False
         )
         e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
@@ -258,6 +282,38 @@ class moderation(commands.Cog):
             e2 = discord.Embed(color=main_color, title=f"Successfully kicked {str(member)}")
             await ctx.send(embed=e2)
             self.bot.dispatch("member_kick__", member=member, reason=reason, kicked_by=ctx.author)
+        if not member:
+            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
+            return await ctx.send(embed=e)
+        elif not reason:
+            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
+            return await ctx.send(embed=e)
+
+    @commands.command(name="kick", help="Kicks the member mentioned.")
+    @commands.guild_only()
+    @commands.has_role(moderatorRoleId)
+    async def kick(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
+        if member and reason:
+            await member.kick(reason=reason)
+            e2 = discord.Embed(color=main_color, title=f"Successfully kicked {str(member)}")
+            await ctx.send(embed=e2)
+            self.bot.dispatch("member_kick__", member=member, reason=reason, kicked_by=ctx.author)
+        if not member:
+            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
+            return await ctx.send(embed=e)
+        elif not reason:
+            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
+            return await ctx.send(embed=e)
+
+    @commands.command(name="ban", help="Bans the member mentioned.")
+    @commands.guild_only()
+    @commands.has_role(moderatorRoleId)
+    async def ban_(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
+        if member and reason:
+            await member.ban(reason=reason)
+            e2 = discord.Embed(color=main_color, title=f"Successfully banned {str(member)}")
+            await ctx.send(embed=e2)
+            self.bot.dispatch("member_ban__", member=member, reason=reason, banned_by=ctx.author)
         if not member:
             e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
             return await ctx.send(embed=e)
