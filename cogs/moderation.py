@@ -256,7 +256,7 @@ class moderation(commands.Cog):
             # title="Member Kicked"
         )
         e.add_field(
-            name="Member kicked:",
+            name="Member banned:",
             value=f"• **Name**: {member.name} - {member.mention}\n"
                   f"• **ID**: {member.id}\n"
                   f"• **Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
