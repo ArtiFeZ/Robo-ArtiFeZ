@@ -10,9 +10,9 @@ time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
 time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 
 def setup(bot):
-    bot.add_cog(mute(bot))
+    bot.add_cog(moderation(bot))
 
-class mute(commands.Cog):
+class moderation(commands.Cog):
 
     def __init__(self, bot : commands.Bot):
         self.bot = bot
@@ -30,22 +30,22 @@ class mute(commands.Cog):
             color=main_color,
         )
         embed.add_field(
-            name="Member unmuted",
+            name="Member unmuted:",
             value=f"<@{data['user_id']}> ({data['user_id']})",
             inline=False
         )
         embed.add_field(
-            name="Was muted by",
+            name="Was muted by:",
             value=f"<@{data['muted_by']}> ({data['muted_by']})",
             inline=False
         )
         embed.add_field(
-            name="Was muted for",
+            name="Was muted for:",
             value=f"{timestr}",
             inline=False
         )
         embed.add_field(
-            name="Reason",
+            name="Reason:",
             value=f"{data['reason']}",
             inline=False
         )
@@ -67,22 +67,22 @@ class mute(commands.Cog):
             color=main_color,
         )
         embed.add_field(
-            name="Member muted",
+            name="Member muted:",
             value=f"<@{data['user_id']}> ({data['user_id']})",
             inline=False
         )
         embed.add_field(
-            name="Muted by",
+            name="Muted by:",
             value=f"<@{data['muted_by']}> ({data['muted_by']})",
             inline=False
         )
         embed.add_field(
-            name="Duration",
+            name="Duration:",
             value=f"{timestr}",
             inline=False
         )
         embed.add_field(
-            name="Reason",
+            name="Reason:",
             value=f"{data['reason']}",
             inline=False
         )
@@ -141,9 +141,9 @@ class mute(commands.Cog):
         '''Mutes the member mentioned for the time mentioned.'''
         ugh = '"'
         usageEmbed = discord.Embed(color=discord.Color.red(),
-                                   title="Incorrect usage!",
+                                   title="Incorrect  usage!",
                                    description="Usage:\n"
-                                               "• `.mute [duration] [member] [reason]`\n• `.mute 1d2h5m 12344566721 he did not follow #x rule`\n\n"
+                                               "• `.mute [duration] [member] [reason]`\n• `.mute 1d2h5m 12344566721 he did not follow #2 rule`\n\n"
                                                "Note:\n"
                                                "• Duration can contain: `m`, `h`, `d` and `s`\n"
                                                f"• Member can contain: `@member`, `{ugh}member name{ugh}`, `member ID (12311414)`\n"
@@ -168,8 +168,8 @@ class mute(commands.Cog):
                 e1 = discord.Embed(color=main_color,
                                    title="Already Muted!",
                                    description=f"**{str(member)}** has already been muted!")
-                return await ctx.send(f"**{str(member)}** is already muted.")
-            query = "INSERT INTO mute (user_id, muted_at, unmute_at, roles_before, unmuted, muted_by, reason) VALUES ($1, $2, $3, $4, $5, $6, $7)"
+                return await ctx.send(embed=e1)
+            query = "INSERT INTO mute (user_id, muted_at, unmute_at, roles_before, unmuted, muted_by, reason) VALUES  ($1, $2, $3, $4, $5, $6, $7)"
             await self.bot.pool.execute(query, str(member.id), muted_at, unmute_at, roles_before, False, str(ctx.author.id), reason)
             for x in member.roles[1:]:
                 try:
@@ -222,3 +222,44 @@ class mute(commands.Cog):
             else:
                 return await ctx.send(
                     embed=discord.Embed(title=f"There was an error! Please contact Videro#9999", color=main_color))
+
+    @commands.Cog.listener()
+    async def on_member_kick__(self, member : discord.Member, reason : str, kicked_by : discord.Member):
+        channel = self.bot.get_channel(modLogsChannelId)
+        e = discord.Embed(
+            color=main_color,
+            title="Member Kicked"
+        )
+        e.add_field(
+            name="Member kicked:",
+            value=f"• **Name**: {member.name} - {member.mention}\n"
+                  f"• **ID**: {member.id}\n"
+                  f"• **Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"• **Roles ({len(member.roles[:1])})**: {', '.join(x.mention for x in member.roles[:1])}",
+            inline=False
+        )
+        e.add_field(
+            name="Kicked by:",
+            value=f"• **Name**: {kicked_by.name} - {kicked_by.mention}\n"
+                  f"• **ID**: {kicked_by.id}\n"
+                  f"• **Reason**: {reason}", inline=False
+        )
+        e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
+        await channel.send(embed=e)
+
+    @commands.command(name="kick", help="Kicks the member mentioned.")
+    @commands.guild_only()
+    @commands.has_role(moderatorRoleId)
+    async def kick(self, ctx : commands.Context, member : discord.Member = None, reason : str = None):
+        if member and reason:
+            await member.kick(reason=reason)
+            e2 = discord.Embed(color=main_color, title=f"Successfully kicked {str(member)}")
+            await ctx.send(embed=e2)
+            self.bot.dispatch("member_kick__", member=member, reason=reason, kicked_by=ctx.author)
+        if not member:
+            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
+            return await ctx.send(embed=e)
+        elif not reason:
+            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
+            return await ctx.send(embed=e)
