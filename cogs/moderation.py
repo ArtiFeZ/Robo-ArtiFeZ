@@ -4,7 +4,7 @@ import json, os
 import datetime
 import asyncpg, re, asyncio, time
 import utils.readabletime as rdTime
-from main import main_color, muteRoleID, moderatorRoleId, ArtiFeZ_guild_id, modLogsChannelId, ArtiFeZGuildIconUrl
+from main import main_color, rulesChannelId, muteRoleID, moderatorRoleId, ArtiFeZ_guild_id, modLogsChannelId, ArtiFeZGuildIconUrl
 from typing import *
 
 time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
@@ -153,7 +153,7 @@ class moderation(commands.Cog):
         if not duration:
             return await ctx.send(f"{ctx.author.mention} Duration Not Provided.", embed=usageEmbed)
         elif not member:
-            return await ctx.send(f"{ctx.author.mention} Member not mentioned", embed=usageEmbed)
+            return await ctx.send(f"{ctx.author.mention} Member Not Provided.", embed=usageEmbed)
         # elif int(duration) < 600:
         #     return await ctx.send(f"{ctx.author.mention} Duration less than 10 minutes.", embed=usageEmbed)
         elif reason == "Reason not provided.":
@@ -187,7 +187,7 @@ class moderation(commands.Cog):
             self.bot.dispatch("member_mute", data=fetch)
             return await send.edit(content="", embed=embed, delete_after=int(duration))
 
-    @commands.command(name='unmute', help='Unmutes the member mentioned, if the member is muted.', aliases=['um'])
+    @commands.command(name='unmute', help='Unmutes the member provided, if the member is muted.', aliases=['um'])
     @commands.guild_only()
     @commands.cooldown(1, 3, commands.BucketType.member)
     @commands.has_role(moderatorRoleId)
@@ -302,7 +302,7 @@ class moderation(commands.Cog):
         e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
         await channel.send(embed=e)
 
-    @commands.command(name="kick", help="Kicks the member mentioned.")
+    @commands.command(name="kick", help="Kicks the member provided.")
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
     async def kick(self, ctx : commands.Context, member : discord.Member = None, *, reason : str = None):
@@ -312,29 +312,13 @@ class moderation(commands.Cog):
             await ctx.send(embed=e2)
             self.bot.dispatch("member_kick__", member=member, reason=reason, kicked_by=ctx.author)
         if not member:
-            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
+            e = discord.Embed(title="You did not provide a member.", color=discord.Color.red())
             return await ctx.send(embed=e)
         elif not reason:
-            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
+            e = discord.Embed(title="You did not provide a reason.", color=discord.Color.red())
             return await ctx.send(embed=e)
 
-    @commands.command(name="kick", help="Kicks the member mentioned.")
-    @commands.guild_only()
-    @commands.has_role(moderatorRoleId)
-    async def kick(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
-        if member and reason:
-            await member.kick(reason=reason)
-            e2 = discord.Embed(color=main_color, title=f"Successfully kicked {str(member)}")
-            await ctx.send(embed=e2)
-            self.bot.dispatch("member_kick__", member=member, reason=reason, kicked_by=ctx.author)
-        if not member:
-            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
-            return await ctx.send(embed=e)
-        elif not reason:
-            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
-            return await ctx.send(embed=e)
-
-    @commands.command(name="ban", help="Bans the member mentioned.")
+    @commands.command(name="ban", help="Bans the member provided.")
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
     async def ban_(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
@@ -344,13 +328,13 @@ class moderation(commands.Cog):
             await ctx.send(embed=e2)
             self.bot.dispatch("member_ban__", member=member, reason=reason, banned_by=ctx.author)
         if not member:
-            e = discord.Embed(title="You did not mention a member.", color=discord.Color.red())
+            e = discord.Embed(title="You did not provide a member.", color=discord.Color.red())
             return await ctx.send(embed=e)
         elif not reason:
-            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
+            e = discord.Embed(title="You did not provide a reason.", color=discord.Color.red())
             return await ctx.send(embed=e)
 
-    @commands.command(name="unban", help="Unbans the member mentioned.")
+    @commands.command(name="unban", help="Unbans the member provided.")
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
     async def unban_(self, ctx: commands.Context, member: int = None, *, reason: str = None):
@@ -372,5 +356,59 @@ class moderation(commands.Cog):
             e = discord.Embed(title="You did not give a user's ID.", color=discord.Color.red())
             return await ctx.send(embed=e)
         elif not reason:
-            e = discord.Embed(title="You did not mention a reason.", color=discord.Color.red())
+            e = discord.Embed(title="You did not provide a reason.", color=discord.Color.red())
             return await ctx.send(embed=e)
+
+    @commands.command(name="warn", help="Warns the member provided.")
+    @commands.guild_only()
+    @commands.has_role(moderatorRoleId)
+    async def _warn(self, ctx : commands.Context, member : discord.Member = None , *, reason : str = None):
+        if member and reason:
+            query = "SELECT * FROM warns WHERE user_id = $1"
+            check = await self.bot.pool.fetch(query, member.id)
+            if check:
+                query2 = "UPDATE warns SET warns = $1 + 1 WHERE user_id = $2"
+                await self.bot.pool.execute(query2, check[0]['warns'], member.id)
+                x = ""
+                if str(check[0]['warns'] + 1).endswith("1"):
+                    x = "st"
+                elif str(check[0]['warns'] + 1).endswith("2"):
+                    x = "nd"
+                elif str(check[0]['warns'] + 1).endswith("3"):
+                    x = "rd"
+                else:
+                    x = "th"
+                e3 = discord.Embed(color=main_color, title=f"",
+                                   description=f"**Successfully warned {str(member)}. This is their {check[0]['warns'] + 1}{x} warning.**")
+                await member.send(embed=discord.Embed(color=main_color,
+                                                      title="You have been warned.",
+                                                      description=f"You have been warned in **{ctx.guild.name}**.\n"
+                                                                  f"Reason: **{reason}**\n"
+                                                                  f"Warned by: **{str(ctx.author)}**\n"
+                                                                  f"This is your **{check[0]['warns'] + 1}{x}** warning.\n"
+                                                                  f"Make sure to check <#{rulesChannelId}> for info on the warn system.",
+                                                      timestamp=datetime.datetime.utcnow())
+                                  .set_footer(text="Warned at")
+                                  .set_author(name=self.bot.user.name, icon_url=ctx.guild.icon_url))
+                return await ctx.send(embed=e3)
+            if not check:
+                query3 = "INSERT INTO warns (warns, user_id) VALUES (1, $1)"
+                await self.bot.pool.execute(query3, member.id)
+                e3 = discord.Embed(color=main_color, description=f"**Successfully warned {str(member)}. This is their 1st warning.**")
+                await member.send(embed=discord.Embed(color=main_color,
+                                                      title="You have been warned.",
+                                                      description=f"You have been warned in **{ctx.guild.name}**.\n"
+                                                                  f"Reason: **{reason}**\n"
+                                                                  f"Warned by: **{str(ctx.author)}**\n"
+                                                                  f"This is your first warning.\n"
+                                                                  f"Make sure to check <#{rulesChannelId}> for info on the warn system.",
+                                                      timestamp=datetime.datetime.utcnow())
+                                  .set_footer(text="Warned at")
+                                  .set_author(name=self.bot.user.name, icon_url=ctx.guild.icon_url))
+                return await ctx.send(embed=e3)
+        elif not member:
+            e3 = discord.Embed(color = discord.Color.red(), title="You did not provide a member.")
+            return await ctx.send(embed=e3)
+        elif not reason:
+            e3 = discord.Embed(color = discord.Color.red(), title="You did not provide a reason.")
+            return await ctx.send(embed=e3)
