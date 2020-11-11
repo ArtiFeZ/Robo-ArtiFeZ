@@ -456,3 +456,25 @@ class moderation(commands.Cog):
             return await ctx.send(content=f"{ctx.author.mention}, you did not specify a member.", embed=helpEmbed)
         if not warns:
             return await ctx.send(content=f"{ctx.author.mention}, you did not specify number of warns.", embed=helpEmbed)
+
+    @commands.command(name="resetwarns", help="Clears the amount of warns specified from the member specified", aliases=['rw'])
+    @commands.has_role(moderatorRoleId)
+    @commands.guild_only()
+    async def _resetwarns(self, ctx: commands.Context, member: discord.Member = None):
+        helpEmbed = discord.Embed(color=main_color,
+                                  description='```py\n.rw [member]\n.rw PHYMO_ROCKS\n.rw 1212316161231\n```')
+        if member:
+            user_id = member.id
+            query = "SELECT * FROM warns WHERE user_id = $1"
+            fetch = await self.bot.pool.fetch(query, user_id)
+            if fetch:
+                query2 = "DELETE FROM warns WHERE user_id = $1"
+                await self.bot.pool.execute(query2, user_id)
+                e3 = discord.Embed(color=main_color,
+                                   description=f"**Successfully removed all warnings from {str(member)}.**")
+                return await ctx.send(embed=e3)
+            if not fetch:
+                e2 = discord.Embed(color=main_color, title=f"{str(member)} has no warnings.")
+                return await ctx.send(embed=e2)
+        if not member:
+            return await ctx.send(content=f"{ctx.author.mention}, you did not specify a member.", embed=helpEmbed)
