@@ -19,6 +19,7 @@ class errors(commands.Cog):
         elif isinstance(error, commands.NoPrivateMessage):
             return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command cannot be used in private messages."))
         elif isinstance(error, commands.BadArgument):
-            return await ctx.send(embed=discord.Embed(color=main_color, title="Nope.", description="**" + str(error) + "**"))
+            return await ctx.send(embed=discord.Embed(color=main_color, description="**" + str(error) + "**"))
         else:
+            await ctx.send(error)
             raise error

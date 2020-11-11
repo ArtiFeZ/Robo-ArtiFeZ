@@ -28,16 +28,31 @@ bot.load_extension('jishaku')
 async def pool_run():
     bot.pool = await asyncpg.create_pool(database='ArtiFeZ', password=database_pw, user='postgres')
 
+loaded = 0
+not_loaded = 0
 for x in os.listdir('cogs'):
     if x.endswith(".py"):
-        bot.load_extension("cogs." + x[:-3])
+        try:
+            bot.load_extension("cogs." + x[:-3])
+            loaded += 1
+        except:
+            not_loaded += 1
+            pass
 
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="over ArtiFeZ"))
-    print(f"Logged in as {str(bot.user)}!")
-    print(f"ArtiFeZ members: {len(bot.users)}")
+    print(f"───────────────")
+    print(f"Logged in as {str(bot.user)}")
+    print(f"Successfully loaded {loaded}/{loaded + not_loaded} cogs")
+    print(f"ArtiFeZ members: {len((bot.get_guild(ArtiFeZ_guild_id)).members)}")
     print(f"Average latency: {round(int(bot.latency * 1000))}ms")
+    print(f"───────────────")
+
+@bot.event
+async def on_guild_join(guild):
+    if guild.id != ArtiFeZ_guild_id:
+        return await guild.leave()
 
 @bot.command(name="ping", help="shows the latency of the bot, not yours.")
 async def ping(ctx : commands.Context):
@@ -60,8 +75,6 @@ async def ping(ctx : commands.Context):
     e2.set_footer(text=bot.user.name, icon_url=bot.user.avatar_url)
     return await aw.edit(embed=e2)
     # await ctx.send("works!")
-
-
 
 bot.loop.run_until_complete(pool_run())
 bot.run(str(token))

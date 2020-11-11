@@ -18,6 +18,7 @@ class moderation(commands.Cog):
     def __init__(self, bot : commands.Bot):
         self.bot = bot
         self.bot.loop.create_task(self.unmute_on_time())
+        self.bot.loop.create_task(self.delete_warns())
 
     @commands.Cog.listener()
     async def on_member_unmute(self, data: list):
@@ -92,6 +93,12 @@ class moderation(commands.Cog):
         member = self.bot.get_user(id = int(data['muted_by']))
         embed.set_footer(text=f"Muted by {str(member)}", icon_url=member.avatar_url)
         await channel.send(embed=embed)
+
+    async def delete_warns(self):
+        while True:
+            await self.bot.wait_until_ready()
+            await self.bot.pool.execute("DELETE FROM warns WHERE warns <= 0")
+            await asyncio.sleep(60)
 
     async def unmute_on_time(self):
         while True:
@@ -302,10 +309,10 @@ class moderation(commands.Cog):
         e.set_author(icon_url=ArtiFeZGuildIconUrl, name=self.bot.user.name)
         await channel.send(embed=e)
 
-    @commands.command(name="kick", help="Kicks the member provided.")
+    @commands.command(name="kick", help="Kicks the member provided.", aliases = ['k'])
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
-    async def kick(self, ctx : commands.Context, member : discord.Member = None, *, reason : str = None):
+    async def _kick(self, ctx : commands.Context, member : discord.Member = None, *, reason : str = None):
         if member and reason:
             await member.kick(reason=reason)
             e2 = discord.Embed(color=main_color, title=f"Successfully kicked {str(member)}")
@@ -318,7 +325,7 @@ class moderation(commands.Cog):
             e = discord.Embed(title="You did not provide a reason.", color=discord.Color.red())
             return await ctx.send(embed=e)
 
-    @commands.command(name="ban", help="Bans the member provided.")
+    @commands.command(name="ban", help="Bans the member provided.", aliases = ['b'])
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
     async def ban_(self, ctx: commands.Context, member: discord.Member = None, *, reason: str = None):
@@ -334,7 +341,7 @@ class moderation(commands.Cog):
             e = discord.Embed(title="You did not provide a reason.", color=discord.Color.red())
             return await ctx.send(embed=e)
 
-    @commands.command(name="unban", help="Unbans the member provided.")
+    @commands.command(name="unban", help="Unbans the member provided.", aliases=['ub'])
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
     async def unban_(self, ctx: commands.Context, member: int = None, *, reason: str = None):
@@ -359,7 +366,7 @@ class moderation(commands.Cog):
             e = discord.Embed(title="You did not provide a reason.", color=discord.Color.red())
             return await ctx.send(embed=e)
 
-    @commands.command(name="warn", help="Warns the member provided.")
+    @commands.command(name="warn", help="Warns the member provided.", aliases=["w"])
     @commands.guild_only()
     @commands.has_role(moderatorRoleId)
     async def _warn(self, ctx : commands.Context, member : discord.Member = None , *, reason : str = None):
@@ -412,3 +419,40 @@ class moderation(commands.Cog):
         elif not reason:
             e3 = discord.Embed(color = discord.Color.red(), title="You did not provide a reason.")
             return await ctx.send(embed=e3)
+
+    @commands.command(name="warns", help="Shows the warsn of the member mentioned.", aliases=["warnings", "showwarns", "sw"])
+    @commands.has_role(moderatorRoleId)
+    @commands.guild_only()
+    async def _warns(self, ctx : commands.Context, member : discord.Member = None):
+        user_id = member.id
+        query = "SELECT * FROM warns WHERE user_id = $1"
+        fetch = await self.bot.pool.fetch(query, user_id)
+        if fetch:
+            e = discord.Embed(color=main_color, title=f"{str(member)} has {fetch[0]['warns']} warning{'' if int(fetch[0]['warns']) == 1 else 's'}")
+            return await ctx.send(embed=e)
+        if not fetch:
+            e = discord.Embed(color=main_color, title=f"{str(member)} has no warnings")
+            return await ctx.send(embed=e)
+
+    @commands.command(name="clearwarns", help="Clears the amount of warns specified from the member specified", aliases=['cw'])
+    @commands.has_role(moderatorRoleId)
+    @commands.guild_only()
+    async def _clearwarns(self, ctx: commands.Context, member : discord.Member = None, warns : int = None):
+        helpEmbed = discord.Embed(color=main_color, description='```py\n.cw [member] [number of warns]\n.cw PHYMO_ROCKS 3\n.cw 1212316161231 5\n```')
+        if member and warns:
+            user_id = member.id
+            query = "SELECT * FROM warns WHERE user_id = $1"
+            fetch = await self.bot.pool.fetch(query, user_id)
+            if fetch:
+                query2 = "UPDATE warns SET warns = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query2, int(fetch[0]['warns']) - warns, user_id)
+                e3 = discord.Embed(color=main_color, description=f"**Successfully cleared {warns} warnings from {str(member)}.**\n"
+                                                                 f"**{str(member)} now has {(fetch[0]['warns'] - warns) if (fetch[0]['warns'] - warns) >= 0 else 0} warnings.**")
+                return await ctx.send(embed=e3)
+            if not fetch:
+                e2 = discord.Embed(color=main_color, title=f"{str(member)} has no warnings.")
+                return await ctx.send(embed=e2)
+        if not member:
+            return await ctx.send(content=f"{ctx.author.mention}, you did not specify a member.", embed=helpEmbed)
+        if not warns:
+            return await ctx.send(content=f"{ctx.author.mention}, you did not specify number of warns.", embed=helpEmbed)
