@@ -376,7 +376,6 @@ class moderation(commands.Cog):
             if check:
                 query2 = "UPDATE warns SET warns = $1 + 1 WHERE user_id = $2"
                 await self.bot.pool.execute(query2, check[0]['warns'], member.id)
-                x = ""
                 if str(check[0]['warns'] + 1).endswith("1"):
                     x = "st"
                 elif str(check[0]['warns'] + 1).endswith("2"):

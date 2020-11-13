@@ -1,6 +1,5 @@
 import datetime, calendar
 
-
 def get_years(timeBetween, year, reverse):
     years = 0
 

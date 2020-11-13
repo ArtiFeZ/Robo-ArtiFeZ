@@ -16,8 +16,9 @@ main_color         = 0x18adff
 ArtiFeZ_guild_id   = 715126942294343700
 ArtiFeZGuildIconUrl= "https://cdn.discordapp.com/icons/715126942294343700/a_f0571bc3d48dc0d401cf2a9dc9c01457.gif?size=1024"
 bot                = commands.Bot(
-command_prefix     = commands.when_mentioned_or("?", "!", "-", "/", "."),
+command_prefix     = commands.when_mentioned_or("/", "."),
 intents            = intents,
+case_insensitive   = True
 )
 muteRoleID         = 765559649097089086
 moderatorRoleId    = 767980191438995516
