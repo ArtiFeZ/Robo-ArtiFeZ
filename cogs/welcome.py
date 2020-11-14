@@ -4,6 +4,9 @@ from utils.readabletime import getReadableTimeBetween
 from main import main_color, chatChannelId, ArtiFeZGuildIconUrl
 import datetime, random
 
+def setup(bot):
+    bot.add_cog(welcome(bot))
+
 class welcome(commands.Cog):
     def __init__(self, bot : commands.Bot):
         self.bot = bot

@@ -37,15 +37,15 @@ for x in os.listdir('cogs'):
         try:
             bot.load_extension("cogs." + x[:-3])
             loaded += 1
-        except:
+        except Exception as e:
             not_loaded += 1
-            pass
+            raise e
 
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="over ArtiFeZ"))
     print(f"───────────────")
-    print(f"Logged in as {str(bot.user)}")
+    print(f"Logged in as {str(bot.user)} ({bot.user.id})")
     print(f"Successfully loaded {loaded}/{loaded + not_loaded} cogs")
     print(f"ArtiFeZ members: {len((bot.get_guild(ArtiFeZ_guild_id)).members)}")
     print(f"Average latency: {round(int(bot.latency * 1000))}ms")

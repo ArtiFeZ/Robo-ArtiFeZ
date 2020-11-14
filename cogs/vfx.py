@@ -21,7 +21,7 @@ class vfx(commands.Cog):
             for command in cog.walk_commands():
                 if not isinstance(command, commands.Group):
                     e.add_field(
-                        name=f"{ctx.prefix}{command.full_parent_name} {command.name} {command.signature}",
+                        name=f".{command.full_parent_name} {command.name} {command.signature}",
                         value="⮑  " + command.help,
                         inline=False
                     )
