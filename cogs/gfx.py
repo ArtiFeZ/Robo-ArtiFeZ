@@ -36,13 +36,25 @@ class gfx(commands.Cog):
     async def _gfx_tuts(self, ctx: commands.Context) :
         """Gives a neat list of some major gfx tutorials, according to the level of difficulty."""
         beginners = {
-            "None yet" : "None yet"
+            "Adobe Photoshop for Beginners".title() : "https://youtu.be/pFyOznL9UvA",
+            "How to make thumbnails".title() : "https://youtu.be/k8B4urrTtxQ",
+            "How To Make Thumbnails by Videro 😎" : "https://youtu.be/e-_DAvnMNDo",
+            "How to make an easy esports banner".title() : "https://youtu.be/8Nl9RX4Yu7E",
+            "How to make a stream package".title() : "https://youtu.be/l_Ddn7h8tDM",
+            "How to do Photo manipulation".title() : "https://youtu.be/4hdWChhovvg"
         }
         moderate = {
-            "None yet" : "None yet"
+            "How to make 3D text in Cinema 4D".title() : "https://youtu.be/XmNDi109ECw",
+            "How to design emotes".title(): "https://youtu.be/cv80MVC4-tI",
+            "How to create Gradient Highlight Mesh Effect".title() : "https://youtu.be/3jiBBesNcB0",
+            "How to create fluid abstract background".title() : "https://youtu.be/lG4-03pDFw8",
+            "How to create liquid marbelling effects".title() : "https://youtu.be/ouviTuZUB4E",
+            "Advanced photo manipulation".title() : "https://youtu.be/XnzGFtUevts",
+            "Easy dual lighting effect".title() : "https://youtu.be/Osgt7LP0720",
+            "Master Curves in Photoshop".title() : "https://youtu.be/Bvyiydd2dMc",
         }
         experienced = {
-            "None yet" : "None yet"
+            "Not added yet" : "https://www.youtube.com/"
         }
         embed = get_tutorial_embed(beginners, moderate, experienced, "GFX Tutorials")
         return await ctx.send(embed=embed)
@@ -52,7 +64,7 @@ class gfx(commands.Cog):
     @commands.guild_only()
     async def _gfx_packs(self, ctx: commands.Context) :
         packs: dict = {
-            "None yet" : "None yet"
+            "Not added yet" : "https://www.youtube.com/"
         }
         e = get_packs_embed(packs, "GFX Packs")
         return await ctx.send(embed=e)
