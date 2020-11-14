@@ -63,6 +63,7 @@ class vfx(commands.Cog):
 
     @vfx.command(name="packs", help="Gives a list of some popular vfx packs.", aliases=['pack', 'p'])
     @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.member)
     async def _vfx_packs(self, ctx : commands.Context):
         packs : dict = {
           "Mega Vfx Pack 2020 - Green Screens, Transitions, Animated Backgrounds & More!\nBy Gauravz" : "https://www.youtube.com/watch?v=muJ204vRkZo",
