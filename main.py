@@ -24,6 +24,7 @@ muteRoleID         = 765559649097089086
 moderatorRoleId    = 767980191438995516
 modLogsChannelId   = 716924699853979728
 rulesChannelId     = 715165480666529812
+chatChannelId      = 715868519329300543
 bot.load_extension('jishaku')
 
 async def pool_run():
