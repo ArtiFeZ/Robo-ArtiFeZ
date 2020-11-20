@@ -32,7 +32,7 @@ class welcome(commands.Cog):
         e = discord.Embed(title="Member Left", color=main_color)
         e.description = f"• **Name**: {member.mention}\n" \
                         f"• **Joined at**: {time_split[0] + ' and ' + time_split[1]} ago.\n" \
-                        f"• **Roles ({len(member.roles)})**: {', '.join(x.mention for x in member.roles)}"
+                        f"• **Roles ({len(member.roles[1:])})**: {', '.join(x.mention for x in member.roles[1:])}"
         e.set_author(name=str(member), icon_url=member.avatar_url)
         e.set_footer(text=self.bot.user.name, icon_url=ArtiFeZGuildIconUrl)
-        await channel.send(embed=e)
+        return await channel.send(embed=e)

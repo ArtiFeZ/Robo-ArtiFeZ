@@ -38,7 +38,7 @@ class gfx(commands.Cog):
         beginners = {
             "Adobe Photoshop for Beginners".title() : "https://youtu.be/pFyOznL9UvA",
             "How to make thumbnails".title() : "https://youtu.be/k8B4urrTtxQ",
-            "How To Make Thumbnails by Videro 😎" : "https://youtu.be/e-_DAvnMNDo",
+            "How To Make Thumbnails by Videro \\😎".title() : "https://youtu.be/e-_DAvnMNDo",
             "How to make an easy esports banner".title() : "https://youtu.be/8Nl9RX4Yu7E",
             "How to make a stream package".title() : "https://youtu.be/l_Ddn7h8tDM",
             "How to do Photo manipulation".title() : "https://youtu.be/4hdWChhovvg"
@@ -62,9 +62,38 @@ class gfx(commands.Cog):
     @gfx.command(name="packs", help="Gives a list of some popular gfx packs.", aliases=['pack', 'p'])
     @commands.cooldown(1, 5, commands.BucketType.member)
     @commands.guild_only()
-    async def _gfx_packs(self, ctx: commands.Context) :
-        packs: dict = {
-            "Not added yet" : "https://www.youtube.com/"
-        }
-        e = get_packs_embed(packs, "GFX Packs")
-        return await ctx.send(embed=e)
+    async def _gfx_packs(self, ctx: commands.Context, pc_mob : str = None) -> discord.Message:
+        if not pc_mob:
+            packs: dict = {
+                "Glitch Pack - BEST GFX PACK FREE - ANDROID & PC FREE PACK | Abstract GFX PACK 2020\nBy Greck x Lennox" : "https://www.youtube.com/watch?v=79Y8wjUEIjs",
+                "GFX PACK! #1 (ANDROID + IOS + PC)\nBy NaoriChan•恋人" : "https://www.youtube.com/watch?v=5vPG2mZtW88",
+                "More soon" : "https://www.youtube.com/",
+                "a": "",
+                "b": "",
+                "c": "",
+                "d": "",
+                "e": "",
+                "f": "",
+                "g": "",
+            }
+            e = get_packs_embed(packs, "GFX Packs (Both 💻 and 📱)")
+            return await ctx.send(embed=e)
+        if pc_mob:
+            if "p" in pc_mob.lower():
+                packs : dict = {
+                    "Not added yet" : "https://www.youtube.com/"
+                }
+                e = get_packs_embed(packs, "GFX Packs (Only 💻)")
+                return await ctx.send(embed=e)
+            elif "m" in pc_mob.lower():
+                packs: dict = {
+                    "Not added yet" : "https://www.youtube.com/"
+                }
+                e = get_packs_embed(packs, "GFX Packs (Only 📱)")
+                return await ctx.send(embed=e)
+            else:
+                packs: dict = {
+                    "Not added yet" : "https://www.youtube.com/"
+                }
+                e = get_packs_embed(packs, "GFX Packs (Both 💻 and 📱)")
+                return await ctx.send(embed=e)
