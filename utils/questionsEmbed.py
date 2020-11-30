@@ -3,7 +3,7 @@ from main import *
 
 class qEmbed(discord.Embed):
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self.from_dict(dict(**kwargs))
         self.set_footer(text="Robo-ArtiFeZ", icon_url=ArtiFeZGuildIconUrl)
         self.color = main_color

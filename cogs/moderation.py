@@ -382,6 +382,8 @@ class moderation(commands.Cog):
                     x = "nd"
                 elif str(check[0]['warns'] + 1).endswith("3"):
                     x = "rd"
+                elif str(check[0]['warns'] + 1).endswith("11"):
+                    x = "th"
                 else:
                     x = "th"
                 e3 = discord.Embed(color=main_color, title=f"",

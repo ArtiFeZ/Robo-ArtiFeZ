@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from utils.readabletime import getReadableTimeBetween
-from main import main_color, chatChannelId, ArtiFeZGuildIconUrl, modLogsChannelId
+from main import main_color, CommunityRoleID, chatChannelId, ArtiFeZGuildIconUrl, modLogsChannelId
 import datetime, random
 
 def setup(bot):
@@ -13,16 +13,19 @@ class welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member : discord.Member):
+        await member.add_roles(discord.Object(CommunityRoleID))
         channel = self.bot.get_channel(chatChannelId)
         time = getReadableTimeBetween(member.created_at.timestamp(), datetime.datetime.utcnow().timestamp())
         time_split = time.split(",")
         e = discord.Embed(title="New Member!", color=main_color)
         e.description = f"• **Name**: {member.mention}\n" \
                         f"• **Account Created**: {time_split[0] + ' and ' + time_split[1]} ago.\n" \
-                        f"• **Lucky Number**: {random.randint(1, 50)} 🙂"
+                        f"• **Lucky Number**: {random.randint(1, 10)} <a:party_blob:757821206421438464>"
         e.set_author(name=str(member), icon_url=member.avatar_url)
         e.set_footer(text=self.bot.user.name, icon_url=ArtiFeZGuildIconUrl)
         await channel.send(embed=e)
+        e = discord.Embed(title='**Welcome to *ArtiFeZ*!**', color=main_color)
+        e.description = ""
 
     @commands.Cog.listener()
     async def on_member_remove(self, member : discord.Member):

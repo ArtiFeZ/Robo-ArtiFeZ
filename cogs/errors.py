@@ -15,7 +15,7 @@ class errors(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             return
         elif isinstance(error, commands.MissingRole):
-            return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command requires the Moderator role."))
+            return await ctx.send(embed=discord.Embed(color=main_color, description=f"**This command requires the <@&{error.missing_role}> role.**"))
         elif isinstance(error, commands.NoPrivateMessage):
             return await ctx.send(embed=discord.Embed(color=main_color, title=f"This command cannot be used in private messages."))
         elif isinstance(error, commands.BadArgument):
