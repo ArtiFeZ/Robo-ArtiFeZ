@@ -14,12 +14,16 @@ class rReactions(commands.Cog):
     async def on_message(self, message : discord.Message):
         gld : discord.Guild = self.bot.get_guild(ArtiFeZ_guild_id)
         if message.author.bot: return
+        if message.content.startswith(('.', '!', 't-', '?')): return
         emojis = gld.emojis
         remoji = random.choice(emojis)
-        rnum = random.randint(1,8)
-        rnum2 = random.randint(1,8)
+        rnum = random.randint(1,10)
+        rnum2 = random.randint(1,10)
         if rnum2 == rnum:
-            await message.add_reaction(remoji)
+            try:
+                await message.add_reaction(remoji)
+            except:
+                pass
         else:
             return
         await self.bot.process_commands(message)

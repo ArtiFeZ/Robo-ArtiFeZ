@@ -27,6 +27,11 @@ rulesChannelId     = 715165480666529812
 chatChannelId      = 715868519329300543
 ApprovedRoleID     = 781079692174295060
 CommunityRoleID    = 715212118181543998
+AboutUs            = """・ArtifeZ is an Editing Team/Community, where you can showcase your work.
+・We have a system where you can also purchase work from our [Verified Sellers](https://discordapp.com/channels/715126942294343700/782808652994052106).
+・We are powered and presented by [SCYTES Esports](https://www.scytes.com).
+・We also [host competitions](https://discordapp.com/channels/715126942294343700/743868715459936287) and help you grow better and bigger as an artist.
+"""
 bot.load_extension('jishaku')
 
 async def pool_run():
@@ -56,6 +61,11 @@ async def on_ready():
 @bot.event
 async def on_guild_join(guild):
     if guild.id != ArtiFeZ_guild_id:
+        ch = guild.text_channels[0]
+        try:
+            await ch.send('I am not supposed to be here!')
+        except:
+            pass
         return await guild.leave()
 
 @bot.command(name="ping", help="shows the latency of the bot, not yours.")
