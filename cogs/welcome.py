@@ -21,7 +21,7 @@ class welcome(commands.Cog):
         e = discord.Embed(title="New Member!", color=main_color)
         e.description = f"• **Name**: {member.mention}\n" \
                         f"• **Account Created**: {time_split[0] + ' and ' + time_split[1]} ago.\n" \
-                        f"• **Lucky Number**: {random.randint(1, 10)} <a:party_blob:757821206421438464>"
+                        f"• **Lucky Number**: {random.randint(1, 10)} <a:afzparty_blob:783393007075459133>"
         e.set_author(name=str(member), icon_url=member.avatar_url)
         e.set_footer(text=self.bot.user.name, icon_url=ArtiFeZGuildIconUrl)
         await channel.send(embed=e)
@@ -55,7 +55,7 @@ class welcome(commands.Cog):
                 return
             def check(m : discord.Message):
                 return m.author == member and m.channel == init.channel and m.content.startswith(tuple([str(x) for x in range(1,8)]))
-            while tries >= 0:
+            while tries > 0:
                 msg : discord.Message = await self.bot.wait_for('message', check=check)
                 if '1' in msg.content:
                     tries -= 1
@@ -146,32 +146,93 @@ class welcome(commands.Cog):
                     e4.add_field(name='Anything Else?',
                                  value=f'You can still reply with any other number. ( {tries} attempts left )',
                                  inline=False)
+                    await init.channel.send(embed=e4)
                     continue
                 elif '5' in msg.content:
                     tries -= 1
+                    e5 = qEmbed(title="\💫***Gotcha!***", url='https://top.gg/servers/715126942294343700')
+                    e5.add_field(
+                        name='If you are a GFX Designer:',
+                        value="・Head over to <#715205304303747142> and go to [this message](https://discordapp.com/channels/715126942294343700/715205304303747142/769925228896976896).\n"
+                              "・On the message, [react](https://discordapp.fandom.com/wiki/Reactions#:~:text=To%20react%2C%20users%20must%20mouse,emojis%20present%20in%20the%20menu.) with the 🎨 emoji to get the <@&716245903203106816> role.\n"
+                              "・Now, you can head over to <#765052924073082911> and start sharing your work!\n"
+                              "・And, that's about it!",
+                        inline=False
+                    )
+                    e5.add_field(
+                        name='If you are a VFX Editor:',
+                        value="・Head over to <#715205304303747142> and go to [this message](https://discordapp.com/channels/715126942294343700/715205304303747142/769925228896976896).\n"
+                              "・On the message, [react](https://discordapp.fandom.com/wiki/Reactions#:~:text=To%20react%2C%20users%20must%20mouse,emojis%20present%20in%20the%20menu.) with the 🎥 emoji to get the <@&716246064306323577> role.\n"
+                              "・Now, you can head over to <#765054200647254016> and start sharing your work!\n"
+                              "・And, that's about it!",
+                        inline=False
+                    )
+                    e5.add_field(
+                        name='If you are a SFX Producer:',
+                        value="・Head over to <#715205304303747142> and go to [this message](https://discordapp.com/channels/715126942294343700/715205304303747142/769925228896976896).\n"
+                              "・On the message, [react](https://discordapp.fandom.com/wiki/Reactions#:~:text=To%20react%2C%20users%20must%20mouse,emojis%20present%20in%20the%20menu.) with the 🎵 emoji to get the <@&716246158087028736> role.\n"
+                              "・Now, you can head over to <#769955894456221696> and share your work.\n"
+                              "・And, that's pretty much it!",
+                        inline=False
+                    )
+                    e5.add_field(name='Anything Else?',
+                                 value=f'You can still reply with any other number. ( {tries} attempts left )',
+                                 inline=False)
+                    await init.channel.send(embed=e5)
                     continue
                 elif '6' in msg.content:
                     tries -= 1
+                    e6 = qEmbed(title="\📨 ***Hello There!***", url="https://top.gg/servers/715126942294343700")
+                    e6.add_field(
+                        name="More Help",
+                        value=f"・You can head over to either <#715851273571794965> or <#765059841890320394> and tag the <@&765531157721776148>.\n"
+                              f"・Glad you are here! \🥂"
+                    )
+                    e6.add_field(name='Anything Else?',
+                                 value=f'You can still reply with any other number. ( {tries} attempts left )',
+                                 inline=False)
+                    await init.channel.send(embed=e6)
                     continue
                 elif '7' in msg.content:
                     tries -= 1
+                    e7 = qEmbed(title="\💁🏻‍♂️ ***Alright then!***", url="https://top.gg/servers/715126942294343700")
+                    e7.description = "・Sure thing, we hope you have a great time here in ArtiFeZ!\n" \
+                                     "・Great to have you here! \🥂"
+                    e7.add_field(name='Anything Else?',
+                                 value=f'You can still reply with any other number. ( {tries} attempts left )',
+                                 inline=False)
+                    await init.channel.send(embed=e7)
                     continue
                 else:
                     tries -= 1
                     await init.channel.send(f"`{msg.content if len(msg.content) <= 1750 else 'A really long message'}` is not an valid option! ( {tries} attempts left )")
                     continue
+            await init.channel.send("You have used all your attempts. If you still have any questions, you can head over to <#765059841890320394> and tag the <@&765531157721776148>.")
         except Exception as e:
             if isinstance(e, asyncio.TimeoutError):
                 await member.send('You did not reply in time.')
             else:
-                await member.send('I ran into an error! The developer has bee informed.')
+                videro = self.bot.get_user(331084188268756993)
+                await videro.send(f'Welcome System Error:\n'
+                                  f'```py\n{e}\n```')
+                await member.send(f'I ran into an error! The developer has been informed.\n'
+                                  f'Error :\n'
+                                  f'```\n{e}\n```')
                 raise e
 
     @commands.Cog.listener()
     async def on_member_remove(self, member : discord.Member):
-        channel = self.bot.get_channel(modLogsChannelId)
         time = getReadableTimeBetween(member.joined_at.timestamp(), datetime.datetime.utcnow().timestamp())
         time_split = time.split(",")
+        try:
+            e2 = qEmbed(title="\😥***Sad to see you go***", url='https://top.gg/servers/715126942294343700', description=f'・Thanks for being in our server for {time_split[0]+" and"+time_split[1]}.\n'
+                                                                        f'・If incase you change your mind, here is the invite link \🥺\n'
+                                                                        f'・https://www.discord.gg/nT7kQe6jUE')
+            await member.send(member.mention, embed=e2)
+        except:
+            pass
+        channel = self.bot.get_channel(modLogsChannelId)
+
         e = discord.Embed(title="Member Left", color=main_color)
         e.description = f"• **Name**: {member.mention}\n" \
                         f"• **Joined at**: {time_split[0] + ' and' + time_split[1]} ago.\n" \
