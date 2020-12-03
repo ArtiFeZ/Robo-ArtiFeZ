@@ -15,6 +15,7 @@ class rReactions(commands.Cog):
         gld : discord.Guild = self.bot.get_guild(ArtiFeZ_guild_id)
         if message.author.bot: return
         if message.content.startswith(('.', '!', 't-', '?')): return
+        if not message.guild: return
         emojis = gld.emojis
         remoji = random.choice(emojis)
         rnum = random.randint(1,10)

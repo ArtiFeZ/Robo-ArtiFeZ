@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from utils.questionsEmbed import qEmbed
+from utils.MainEmbed import qEmbed
 from utils.readabletime import getReadableTimeBetween
 from main import main_color, CommunityRoleID, chatChannelId, ArtiFeZGuildIconUrl, modLogsChannelId, AboutUs
 import datetime, random, asyncio
@@ -18,12 +18,11 @@ class welcome(commands.Cog):
         channel = self.bot.get_channel(chatChannelId)
         time = getReadableTimeBetween(member.created_at.timestamp(), datetime.datetime.utcnow().timestamp())
         time_split = time.split(",")
-        e = discord.Embed(title="New Member!", color=main_color)
+        e = qEmbed(title="New Member!")
         e.description = f"• **Name**: {member.mention}\n" \
                         f"• **Account Created**: {time_split[0] + ' and ' + time_split[1]} ago.\n" \
                         f"• **Lucky Number**: {random.randint(1, 10)} <a:afzparty_blob:783393007075459133>"
         e.set_author(name=str(member), icon_url=member.avatar_url)
-        e.set_footer(text=self.bot.user.name, icon_url=ArtiFeZGuildIconUrl)
         await channel.send(embed=e)
         e2 = qEmbed(title='***Welcome to ArtiFeZ!***', color=main_color,
                     url='https://top.gg/servers/715126942294343700')

@@ -3,6 +3,7 @@ from discord.ext import commands
 from main import main_color, ArtiFeZGuildIconUrl
 from utils.tutorialEmbed import get_tutorial_embed
 from utils.packsEmbed import get_packs_embed
+from utils.MainEmbed import qEmbed
 
 def setup(bot):
     bot.add_cog(vfx(bot))
@@ -17,7 +18,7 @@ class vfx(commands.Cog):
     async def vfx(self, ctx : commands.Context):
         if ctx.invoked_subcommand is None:
             cog : commands.Cog = self.bot.get_cog('vfx')
-            e = discord.Embed(color=main_color, title="VFX Category")
+            e = qEmbed(title="VFX Category")
             for command in cog.walk_commands():
                 if not isinstance(command, commands.Group):
                     e.add_field(
@@ -25,7 +26,7 @@ class vfx(commands.Cog):
                         value="⮑  " + command.help,
                         inline=False
                     )
-            e.set_footer(text=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+            # e.set_footer(text=self.bot.user.name, icon_url=self.bot.user.avatar_url)
             return await ctx.send(embed=e)
         else:
             pass

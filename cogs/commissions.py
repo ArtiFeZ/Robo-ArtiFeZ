@@ -1,7 +1,7 @@
 import discord, asyncio
 from discord.ext import commands
 from main import main_color, ApprovedRoleID, ArtiFeZGuildIconUrl
-from utils.questionsEmbed import qEmbed
+from utils.MainEmbed import qEmbed
 
 def setup(bot):
     bot.add_cog(commissions(bot))
@@ -53,5 +53,5 @@ class commissions(commands.Cog):
                 e2 = discord.Embed(color=discord.Color.red(), title="Please open your DMs.")
                 await ctx.send(embed=e2)
             else:
-                await ctx.send(f"Ran into an error:\n```\n{e}\n```Please Contact Videro#9999 asap.")
+                await ctx.send(f"Ran into an error:\n```\n{e}\n```Please Contact Videro#9999.")
                 raise e
