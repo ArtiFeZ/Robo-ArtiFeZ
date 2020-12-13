@@ -1,6 +1,6 @@
 <img src = "https://cdn.discordapp.com/attachments/718627431673626664/787768252910534686/wide-logo4.png">
 </img>
-# Robo-ArtiFeZ
+<h1>Robo-ArtiFeZ</h1>
 <h3>A bot to help with the activities of ArtiFeZ discord server.</h3>
 <ul>
 <li><b>This project is still under development.</b></li>
