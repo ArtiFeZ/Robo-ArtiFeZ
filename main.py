@@ -3,6 +3,7 @@ from discord.ext import commands
 import json, os
 import datetime
 import asyncpg, re, asyncio, time
+from typing import *
 import utils.readabletime as rdTime
 
 config_read        = open("config.json", "r")
@@ -27,12 +28,14 @@ rulesChannelId     = 715165480666529812
 chatChannelId      = 715868519329300543
 ApprovedRoleID     = 781079692174295060
 CommunityRoleID    = 715212118181543998
+ShowCaseChannelsID = [765053372947890176, 765054300178087938, 769955894456221696]
 AboutUs            = """・ArtifeZ is an Editing Team/Community, where you can showcase your work.
 ・We have a system where you can also purchase work from our [Verified Sellers](https://discordapp.com/channels/715126942294343700/782808652994052106).
 ・We are powered and presented by [SCYTES Esports](https://www.scytes.com).
 ・We also [host competitions](https://discordapp.com/channels/715126942294343700/743868715459936287) and help you grow better and bigger as an artist.
 """
 bot.load_extension('jishaku')
+
 
 async def pool_run():
     bot.pool = await asyncpg.create_pool(database='ArtiFeZ', password=database_pw, user='postgres')
@@ -48,6 +51,7 @@ for x in os.listdir('cogs'):
             not_loaded += 1
             raise e
 
+
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="over ArtiFeZ"))
@@ -58,26 +62,32 @@ async def on_ready():
     print(f"Average latency: {round(int(bot.latency * 1000))}ms")
     print(f"───────────────")
 
+
 @bot.event
 async def on_guild_join(guild):
     if guild.id != ArtiFeZ_guild_id:
         ch = guild.text_channels[0]
         try:
             await ch.send('I am not supposed to be here!')
-        except:
-            pass
-        return await guild.leave()
+            return await guild.leave()
+        except Exception as f:
+            if isinstance(f, discord.Forbidden):
+                pass
+            return await guild.leave()
+    else:
+        pass
+
 
 @bot.command(name="ping", help="shows the latency of the bot, not yours.")
 async def ping(ctx : commands.Context):
     wsLatency = round(int(bot.latency * 1000))
-    e = discord.Embed(
+    e2 = discord.Embed(
         title="🏓  Pong!",
         description=f"Websocket Latency: **{wsLatency}ms**\n",
         color=main_color
     )
-    e.set_footer(text=bot.user.name, icon_url=bot.user.avatar_url)
-    aw = await ctx.send(embed=e)
+    e2.set_footer(text=bot.user.name, icon_url=bot.user.avatar_url)
+    aw = await ctx.send(embed=e2)
     x = datetime.datetime.utcnow() - aw.created_at
     responseTime = round(x.microseconds / 1000)
     e2 = discord.Embed(
