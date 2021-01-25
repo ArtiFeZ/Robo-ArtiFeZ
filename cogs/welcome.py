@@ -11,6 +11,7 @@ def setup(bot):
 class welcome(commands.Cog):
     def __init__(self, bot : commands.Bot):
         self.bot = bot
+        # x = {'footer': {'text': 'React with the emoji to get the role!', 'icon_url': 'https://cdn.discordapp.com/icons/715126942294343700/a_4f8b163f2b8a7c7e5ad1263ed2ed699e.gif?size=1024%27%7D', 'fields': [{'name': 'Interest\U0001fa84', 'value': ':art: - GFX Designer\n:movie_camera: - VFX Editor\n:musical_note: - SFX Producer', 'inline': True}, {'name': 'Platform :gear:', 'value': ':computer: - PC/Laptop\n:mobile_phone: - Mobile/Tablet', 'inline': True}, {'name': 'Opinions :thinking:', 'value': ':paintbrush: - GFX Opinions\n:projector: - VFX Opinions', 'inline': True}, {'name': 'Competitions :trophy:', 'value': ':gfxcomp: - GFX Competitions\n:vfxcomp:  - VFX Competitions', 'inline': True}], 'color': 3201788, 'type': 'rich', 'description': 'React with the appropriate emoji to get yourself the role you reacted with!', 'title': 'Reaction Roles!'}
 
     @commands.Cog.listener()
     async def on_member_join(self, member : discord.Member):

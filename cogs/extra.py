@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from main import ShowCaseChannelsID
+from main import ShowCaseChannelsID, TeamRoleID
 import re
 from utils.MainEmbed import qEmbed
 
@@ -12,6 +12,34 @@ def setup(bot):
 class Extra(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+    @commands.command(name="unload", aliases=["ul"], help="Disables/Unloads an extension.")
+    @commands.has_role(TeamRoleID)
+    async def _unload(self, ctx : commands.Context, name : str = None):
+        if not name:
+            await ctx.send(embed=qEmbed(title="You didn't provide the name of the extension"))
+        if name:
+            self.bot.unload_extension("cogs." + name)
+            await ctx.send(embed=qEmbed(title=f"Successfully disabled the `{name}` extension."))
+
+    @commands.command(name="load", help="Loads an extension.")
+    @commands.has_role(TeamRoleID)
+    async def _load(self, ctx: commands.Context, name: str = None):
+        if not name:
+            await ctx.send(embed=qEmbed(title="You didn't provide the name of the extension"))
+        if name:
+            self.bot.load_extension("cogs." + name)
+            await ctx.send(embed=qEmbed(title=f"Successfully enabled the `{name}` extension."))
+
+    @commands.command(name="reload", aliases=["rl"], help="Reloads an extension.")
+    @commands.has_role(TeamRoleID)
+    async def _reload(self, ctx: commands.Context, name: str = None):
+        if not name:
+            await ctx.send(embed=qEmbed(title="You didn't provide the name of the extension"))
+        if name:
+            self.bot.unload_extension("cogs." + name)
+            self.bot.load_extension("cogs." + name)
+            await ctx.send(embed=qEmbed(title=f"Successfully reloaded the `{name}` extension."))
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):

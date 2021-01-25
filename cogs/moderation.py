@@ -4,6 +4,7 @@ import json, os
 import datetime
 import asyncpg, re, asyncio, time
 import utils.readabletime as rdTime
+from utils.getNumberString import getNumberString
 from main import main_color, rulesChannelId, muteRoleID, moderatorRoleId, ArtiFeZ_guild_id, modLogsChannelId, ArtiFeZGuildIconUrl
 from typing import *
 
@@ -148,17 +149,17 @@ class moderation(commands.Cog):
     @commands.has_role(moderatorRoleId)
     async def mute(self, ctx, duration: TimeConverter = None, member: discord.Member = None, *,
                    reason: str = "Reason not provided."):
-        '''Mutes the member mentioned for the time mentioned.'''
+        """Mutes the member mentioned for the time mentioned."""
         ugh = '"'
         usageEmbed = discord.Embed(color=discord.Color.red(),
                                    title="Incorrect  usage!",
                                    description="Usage:\n"
-                                               "• `.mute [duration] [member] [reason]`\n• `.mute 1d2h5m 12344566721 he did not follow #2 rule`\n\n"
+                                               "・`.mute [duration] [member] [reason]`\n・`.mute 1d2h5m 12344566721 he did not follow #2 rule`\n\n"
                                                "Note:\n"
-                                               "• Duration can contain: `m`, `h`, `d` and `s`\n"
-                                               f"• Member can contain: `@member`, `{ugh}member name{ugh}`, `member ID (12311414)`\n"
-                                               "• Minimum mute time: `10m`\n"
-                                               "• You need to Provide a valid reason.")
+                                               "・Duration can contain: `m`, `h`, `d` and `s`\n"
+                                               f"・Member can contain: `@member`, `{ugh}member name{ugh}`, `member ID (12311414)`\n"
+                                               "・Minimum mute time: `10m`\n"
+                                               "・You need to Provide a valid reason.")
         if not duration:
             return await ctx.send(f"{ctx.author.mention} Duration Not Provided.", embed=usageEmbed)
         elif not member:
@@ -188,8 +189,8 @@ class moderation(commands.Cog):
                     pass
             await member.add_roles(discord.Object(id=muteRoleID), atomic=True)
             embed = discord.Embed(color=main_color, title=f"Success", description=f"Successfully muted {str(member.mention)}\n"
-                                                                                  f"• For:  **{timestr}**.\n"
-                                                                                  f"• Reason: **{reason}**")
+                                                                                  f"・For:  **{timestr}**.\n"
+                                                                                  f"・Reason: **{reason}**")
             embed.set_footer(text=f"{str(member.name)} will be unmuted:")
             embed.timestamp = ctx.message.created_at + datetime.timedelta(seconds=int(duration))
             fetch = await self.bot.pool.fetch("SELECT * FROM mute WHERE unmute_at = $1 AND muted_by = $2", unmute_at, str(ctx.author.id))
@@ -242,18 +243,18 @@ class moderation(commands.Cog):
         )
         e.add_field(
             name="Member kicked:",
-            value=f"• **Name**: {member.name} - {member.mention}\n"
-                  f"• **ID**: {member.id}\n"
-                  f"• **Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
-                  f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
-                  f"• **Roles ({len(member.roles[1:])})**: {', '.join(x.mention for x in member.roles[1:])}",
+            value=f"・**Name**: {member.name} - {member.mention}\n"
+                  f"・**ID**: {member.id}\n"
+                  f"・**Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"・**Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"・**Roles ({len(member.roles[1:])})**: {', '.join(x.mention for x in member.roles[1:])}",
             inline=False
         )
         e.add_field(
             name="Kicked by:",
-            value=f"• **Name**: {kicked_by.name} - {kicked_by.mention}\n"
-                  f"• **ID**: {kicked_by.id}\n"
-                  f"• **Reason**: {reason}", inline=False
+            value=f"・**Name**: {kicked_by.name} - {kicked_by.mention}\n"
+                  f"・**ID**: {kicked_by.id}\n"
+                  f"・**Reason**: {reason}", inline=False
         )
         e.set_footer(text="Kicked at:")
         e.timestamp = datetime.datetime.utcnow()
@@ -269,18 +270,18 @@ class moderation(commands.Cog):
         )
         e.add_field(
             name="Member banned:",
-            value=f"• **Name**: {member.name} - {member.mention}\n"
-                  f"• **ID**: {member.id}\n"
-                  f"• **Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
-                  f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
-                  f"• **Roles ({len(member.roles[1:])})**: {', '.join(x.mention for x in member.roles[1:])}",
+            value=f"・**Name**: {member.name} - {member.mention}\n"
+                  f"・**ID**: {member.id}\n"
+                  f"・**Joined at**: {member.joined_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"・**Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}\n"
+                  f"・**Roles ({len(member.roles[1:])})**: {', '.join(x.mention for x in member.roles[1:])}",
             inline=False
         )
         e.add_field(
             name="Banned by:",
-            value=f"• **Name**: {banned_by.name} - {banned_by.mention}\n"
-                  f"• **ID**: {banned_by.id}\n"
-                  f"• **Reason**: {reason}", inline=False
+            value=f"・**Name**: {banned_by.name} - {banned_by.mention}\n"
+                  f"・**ID**: {banned_by.id}\n"
+                  f"・**Reason**: {reason}", inline=False
         )
         e.set_footer(text="Banned at:")
         e.timestamp = datetime.datetime.utcnow()
@@ -295,16 +296,16 @@ class moderation(commands.Cog):
         )
         e.add_field(
             name="Member unbanned:",
-            value=f"• **Name**: {member.name} - {member.mention}\n"
-                  f"• **ID**: {member.id}\n"
-                  f"• **Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}",
+            value=f"・**Name**: {member.name} - {member.mention}\n"
+                  f"・**ID**: {member.id}\n"
+                  f"・**Created at**: {member.created_at.strftime('%d %b %Y at %I:%M %p')}",
             inline=False
         )
         e.add_field(
             name="Unbanned by:",
-            value=f"• **Name**: {unbanned_by.name} - {unbanned_by.mention}\n"
-                  f"• **ID**: {unbanned_by.id}\n"
-                  f"• **Reason**: {reason}", inline=False
+            value=f"・**Name**: {unbanned_by.name} - {unbanned_by.mention}\n"
+                  f"・**ID**: {unbanned_by.id}\n"
+                  f"・**Reason**: {reason}", inline=False
         )
         e.set_footer(text="Unbanned at:")
         e.timestamp = datetime.datetime.utcnow()
@@ -378,28 +379,22 @@ class moderation(commands.Cog):
             if check:
                 query2 = "UPDATE warns SET warns = $1 + 1 WHERE user_id = $2"
                 await self.bot.pool.execute(query2, check[0]['warns'], member.id)
-                if str(check[0]['warns'] + 1).endswith("1"):
-                    x = "st"
-                elif str(check[0]['warns'] + 1).endswith("2"):
-                    x = "nd"
-                elif str(check[0]['warns'] + 1).endswith("3"):
-                    x = "rd"
-                elif str(check[0]['warns'] + 1).endswith("11"):
-                    x = "th"
-                else:
-                    x = "th"
+                x = getNumberString((int(check[0]['warns']) + 1))
                 e3 = discord.Embed(color=main_color, title=f"",
                                    description=f"**Successfully warned {str(member)}. This is their {check[0]['warns'] + 1}{x} warning.**")
-                await member.send(embed=discord.Embed(color=main_color,
-                                                      title="You have been warned.",
-                                                      description=f"You have been warned in **{ctx.guild.name}**.\n"
-                                                                  f"Reason: **{reason}**\n"
-                                                                  f"Warned by: **{str(ctx.author)}**\n"
-                                                                  f"This is your **{check[0]['warns'] + 1}{x}** warning.\n"
-                                                                  f"Make sure to check <#{rulesChannelId}> for info on the warn system.",
-                                                      timestamp=datetime.datetime.utcnow())
-                                  .set_footer(text="Warned at")
-                                  .set_author(name=self.bot.user.name, icon_url=ctx.guild.icon_url))
+                try:
+                    await member.send(embed=discord.Embed(color=main_color,
+                                                          title="You have been warned.",
+                                                          description=f"You have been warned in **{ctx.guild.name}**.\n"
+                                                                      f"Reason: **{reason}**\n"
+                                                                      f"Warned by: **{str(ctx.author)}**\n"
+                                                                      f"This is your **{x}** warning.\n"
+                                                                      f"Make sure to check <#{rulesChannelId}> for info on the warn system.",
+                                                          timestamp=datetime.datetime.utcnow())
+                                      .set_footer(text="Warned at")
+                                      .set_author(name=self.bot.user.name, icon_url=ctx.guild.icon_url))
+                except:
+                    pass
                 return await ctx.send(embed=e3)
             if not check:
                 query3 = "INSERT INTO warns (warns, user_id) VALUES (1, $1)"
@@ -426,7 +421,7 @@ class moderation(commands.Cog):
     @commands.command(name="warns", help="Shows the warsn of the member mentioned.", aliases=["warnings", "showwarns", "sw"])
     @commands.has_role(moderatorRoleId)
     @commands.guild_only()
-    async def _warns(self, ctx : commands.Context, member : discord.Member = None):
+    async def _warns(self, ctx: commands.Context, member: discord.Member = None):
         user_id = member.id
         query = "SELECT * FROM warns WHERE user_id = $1"
         fetch = await self.bot.pool.fetch(query, user_id)
@@ -440,7 +435,7 @@ class moderation(commands.Cog):
     @commands.command(name="clearwarns", help="Clears the amount of warns specified from the member specified", aliases=['cw'])
     @commands.has_role(moderatorRoleId)
     @commands.guild_only()
-    async def _clearwarns(self, ctx: commands.Context, member : discord.Member = None, warns : int = None):
+    async def _clearwarns(self, ctx: commands.Context, member: discord.Member = None, warns: int = None):
         helpEmbed = discord.Embed(color=main_color, description='```py\n.cw [member] [number of warns]\n.cw PHYMO_ROCKS 3\n.cw 1212316161231 5\n```')
         if member and warns:
             user_id = member.id

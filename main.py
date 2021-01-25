@@ -5,13 +5,13 @@ import datetime
 import asyncpg, re, asyncio, time
 from typing import *
 import utils.readabletime as rdTime
+# print(discord.__version__)
 
 config_read        = open("config.json", "r")
 config             = json.load(config_read)
 token              = config['token']
 database_pw        = config['database_pw']
-intents            = discord.Intents.all()
-intents.presences  = True
+intents            = discord.Intents.default()
 intents.members    = True
 main_color         = 0x18adff
 ArtiFeZ_guild_id   = 715126942294343700
@@ -29,6 +29,7 @@ chatChannelId      = 715868519329300543
 ApprovedRoleID     = 781079692174295060
 CommunityRoleID    = 715212118181543998
 ShowCaseChannelsID = [765053372947890176, 765054300178087938, 769955894456221696]
+TeamRoleID         = 803291017822470186
 AboutUs            = """・ArtifeZ is an Editing Team/Community, where you can showcase your work.
 ・We have a system where you can also purchase work from our [Verified Sellers](https://discordapp.com/channels/715126942294343700/782808652994052106).
 ・We are powered and presented by [SCYTES Esports](https://www.scytes.com).
