@@ -16,8 +16,8 @@ class Commissions(commands.Cog):
     """
     # Commands List: [all commands are guild-only]
     # Seller Part:
-    # register : register the user
-    # profile : view the profile of the user
+    # register : register the user  ✅
+    # profile : view the profile of the user  ✅
     # set : set/change a value in the profile
     # unset : remove the value from the profile
     # Buyer Part:
