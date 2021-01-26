@@ -36,6 +36,8 @@ AboutUs            = """・ArtifeZ is an Editing Team/Community, where you can s
 ・We also [host competitions](https://discordapp.com/channels/715126942294343700/743868715459936287) and help you grow better and bigger as an artist.
 """
 bot.load_extension('jishaku')
+TwitterEmoji       = "<:afzTwitter:783822204109586484>"
+InstaEmoji         = "<:afzinsta:803483570240225280>"
 
 
 async def pool_run():

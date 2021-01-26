@@ -3,8 +3,10 @@ from discord.ext import commands
 from main import *
 import random
 
+
 def setup(bot):
     bot.add_cog(rReactions(bot))
+
 
 class rReactions(commands.Cog):
     def __init__(self, bot : commands.Bot):
