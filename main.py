@@ -19,7 +19,8 @@ ArtiFeZGuildIconUrl= "https://cdn.discordapp.com/icons/715126942294343700/a_f057
 bot                = commands.Bot(
 command_prefix     = commands.when_mentioned_or("/", "."),
 intents            = intents,
-case_insensitive   = True
+case_insensitive   = True,
+help_command       = None
 )
 muteRoleID         = 765559649097089086
 moderatorRoleId    = 767980191438995516
@@ -53,6 +54,9 @@ for x in os.listdir('cogs'):
         except Exception as e:
             not_loaded += 1
             raise e
+
+# bot.load_extension("cogs.gfx")
+# bot.load_extension("cogs.vfx")
 
 
 @bot.event

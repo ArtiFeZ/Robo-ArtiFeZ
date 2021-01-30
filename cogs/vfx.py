@@ -9,25 +9,15 @@ def setup(bot):
     bot.add_cog(vfx(bot))
 
 class vfx(commands.Cog):
-    """"Command related to VFX like Tutorials, Packs, etc."""
+    """Command related to VFX (Visual Effects/Visual Editing)!"""
 
-    def __init__(self, bot : commands.Bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.group(name="vfx", case_insensitive=True)
     async def vfx(self, ctx : commands.Context):
         if ctx.invoked_subcommand is None:
-            cog : commands.Cog = self.bot.get_cog('vfx')
-            e = qEmbed(title="VFX Category")
-            for command in cog.walk_commands():
-                if not isinstance(command, commands.Group):
-                    e.add_field(
-                        name=f".{command.full_parent_name} {command.name} {command.signature}",
-                        value="⮑  " + command.help,
-                        inline=False
-                    )
-            # e.set_footer(text=self.bot.user.name, icon_url=self.bot.user.avatar_url)
-            return await ctx.send(embed=e)
+            await ctx.invoke(self.bot.get_command("help"), "vfx")
         else:
             pass
 

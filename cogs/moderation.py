@@ -5,7 +5,8 @@ import datetime
 import asyncpg, re, asyncio, time
 import utils.readabletime as rdTime
 from utils.getNumberString import getNumberString
-from main import main_color, rulesChannelId, muteRoleID, moderatorRoleId, ArtiFeZ_guild_id, modLogsChannelId, ArtiFeZGuildIconUrl
+from main import main_color, rulesChannelId, muteRoleID,\
+    moderatorRoleId, ArtiFeZ_guild_id, modLogsChannelId, ArtiFeZGuildIconUrl
 from typing import *
 
 time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
@@ -17,7 +18,7 @@ def setup(bot):
 
 
 class moderation(commands.Cog):
-
+    """Command only accessible to the Moderators of ArtiFeZ!"""
     def __init__(self, bot : commands.Bot):
         self.bot = bot
         self.bot.loop.create_task(self.unmute_on_time())
@@ -154,10 +155,12 @@ class moderation(commands.Cog):
         usageEmbed = discord.Embed(color=discord.Color.red(),
                                    title="Incorrect  usage!",
                                    description="Usage:\n"
-                                               "・`.mute [duration] [member] [reason]`\n・`.mute 1d2h5m 12344566721 he did not follow #2 rule`\n\n"
+                                               "・`.mute [duration] [member] [reason]`\n"
+                                               "・`.mute 1d2h5m 12344566721 he did not follow #2 rule`\n\n"
                                                "Note:\n"
                                                "・Duration can contain: `m`, `h`, `d` and `s`\n"
-                                               f"・Member can contain: `@member`, `{ugh}member name{ugh}`, `member ID (12311414)`\n"
+                                               f"・Member can contain: `@member`, `{ugh}member name{ugh}`"
+                                               f", `member ID (12311414)`\n"
                                                "・Minimum mute time: `10m`\n"
                                                "・You need to Provide a valid reason.")
         if not duration:
@@ -180,20 +183,24 @@ class moderation(commands.Cog):
                                    title="Already Muted!",
                                    description=f"**{str(member)}** has already been muted!")
                 return await ctx.send(embed=e1)
-            query = "INSERT INTO mute (user_id, muted_at, unmute_at, roles_before, unmuted, muted_by, reason) VALUES  ($1, $2, $3, $4, $5, $6, $7)"
-            await self.bot.pool.execute(query, str(member.id), muted_at, unmute_at, roles_before, False, str(ctx.author.id), reason)
+            query = "INSERT INTO mute (user_id, muted_at, unmute_at, roles_before, unmuted, muted_by, reason) " \
+                    "VALUES  ($1, $2, $3, $4, $5, $6, $7)"
+            await self.bot.pool.execute(query, str(member.id), muted_at, unmute_at, roles_before,
+                                        False, str(ctx.author.id), reason)
             for x in member.roles[1:]:
                 try:
                     await member.remove_roles(x)
                 except:
                     pass
             await member.add_roles(discord.Object(id=muteRoleID), atomic=True)
-            embed = discord.Embed(color=main_color, title=f"Success", description=f"Successfully muted {str(member.mention)}\n"
+            embed = discord.Embed(color=main_color, title=f"Success", description=f"Successfully muted"
+                                                                                  f" {str(member.mention)}\n"
                                                                                   f"・For:  **{timestr}**.\n"
                                                                                   f"・Reason: **{reason}**")
             embed.set_footer(text=f"{str(member.name)} will be unmuted:")
             embed.timestamp = ctx.message.created_at + datetime.timedelta(seconds=int(duration))
-            fetch = await self.bot.pool.fetch("SELECT * FROM mute WHERE unmute_at = $1 AND muted_by = $2", unmute_at, str(ctx.author.id))
+            fetch = await self.bot.pool.fetch("SELECT * FROM mute WHERE unmute_at = $1 AND muted_by = $2", unmute_at,
+                                              str(ctx.author.id))
             self.bot.dispatch("member_mute", data=fetch)
             return await send.edit(content="", embed=embed, delete_after=int(duration))
 
@@ -381,7 +388,8 @@ class moderation(commands.Cog):
                 await self.bot.pool.execute(query2, check[0]['warns'], member.id)
                 x = getNumberString((int(check[0]['warns']) + 1))
                 e3 = discord.Embed(color=main_color, title=f"",
-                                   description=f"**Successfully warned {str(member)}. This is their {check[0]['warns'] + 1}{x} warning.**")
+                                   description=f"**Successfully warned {str(member)}. "
+                                               f"This is their {int(check[0]['warns']) + 1}{x} warning.**")
                 try:
                     await member.send(embed=discord.Embed(color=main_color,
                                                           title="You have been warned.",
@@ -389,7 +397,8 @@ class moderation(commands.Cog):
                                                                       f"Reason: **{reason}**\n"
                                                                       f"Warned by: **{str(ctx.author)}**\n"
                                                                       f"This is your **{x}** warning.\n"
-                                                                      f"Make sure to check <#{rulesChannelId}> for info on the warn system.",
+                                                                      f"Make sure to check <#{rulesChannelId}>"
+                                                                      f" for info on the warn system.",
                                                           timestamp=datetime.datetime.utcnow())
                                       .set_footer(text="Warned at")
                                       .set_author(name=self.bot.user.name, icon_url=ctx.guild.icon_url))
@@ -399,14 +408,16 @@ class moderation(commands.Cog):
             if not check:
                 query3 = "INSERT INTO warns (warns, user_id) VALUES (1, $1)"
                 await self.bot.pool.execute(query3, member.id)
-                e3 = discord.Embed(color=main_color, description=f"**Successfully warned {str(member)}. This is their 1st warning.**")
+                e3 = discord.Embed(color=main_color, description=f"**Successfully warned {str(member)}."
+                                                                 f" This is their 1st warning.**")
                 await member.send(embed=discord.Embed(color=main_color,
                                                       title="You have been warned.",
                                                       description=f"You have been warned in **{ctx.guild.name}**.\n"
                                                                   f"Reason: **{reason}**\n"
                                                                   f"Warned by: **{str(ctx.author)}**\n"
                                                                   f"This is your first warning.\n"
-                                                                  f"Make sure to check <#{rulesChannelId}> for info on the warn system.",
+                                                                  f"Make sure to check <#{rulesChannelId}>"
+                                                                  f" for info on the warn system.",
                                                       timestamp=datetime.datetime.utcnow())
                                   .set_footer(text="Warned at")
                                   .set_author(name=self.bot.user.name, icon_url=ctx.guild.icon_url))
@@ -418,25 +429,33 @@ class moderation(commands.Cog):
             e3 = discord.Embed(color = discord.Color.red(), title="You did not provide a reason.")
             return await ctx.send(embed=e3)
 
-    @commands.command(name="warns", help="Shows the warsn of the member mentioned.", aliases=["warnings", "showwarns", "sw"])
+    @commands.command(name="warns", help="Shows the warsn of the member mentioned.",
+                      aliases=["warnings", "showwarns", "sw"])
     @commands.has_role(moderatorRoleId)
     @commands.guild_only()
     async def _warns(self, ctx: commands.Context, member: discord.Member = None):
+        if not member:
+            return await ctx.send(embed=discord.Embed(colour=main_color,
+                                                      title="You did not mention a member."))
+
         user_id = member.id
         query = "SELECT * FROM warns WHERE user_id = $1"
         fetch = await self.bot.pool.fetch(query, user_id)
         if fetch:
-            e = discord.Embed(color=main_color, title=f"{str(member)} has {fetch[0]['warns']} warning{'' if int(fetch[0]['warns']) == 1 else 's'}")
+            e = discord.Embed(color=main_color, title=f"{str(member)} has {fetch[0]['warns']} "
+                                                      f"warning{'' if int(fetch[0]['warns']) == 1 else 's'}")
             return await ctx.send(embed=e)
         if not fetch:
             e = discord.Embed(color=main_color, title=f"{str(member)} has no warnings")
             return await ctx.send(embed=e)
 
-    @commands.command(name="clearwarns", help="Clears the amount of warns specified from the member specified", aliases=['cw'])
+    @commands.command(name="clearwarns", help="Clears the amount of warns specified from the member specified",
+                      aliases=['cw'])
     @commands.has_role(moderatorRoleId)
     @commands.guild_only()
     async def _clearwarns(self, ctx: commands.Context, member: discord.Member = None, warns: int = None):
-        helpEmbed = discord.Embed(color=main_color, description='```py\n.cw [member] [number of warns]\n.cw PHYMO_ROCKS 3\n.cw 1212316161231 5\n```')
+        helpEmbed = discord.Embed(color=main_color, description='```py\n.cw [member] [number of warns]'
+                                                                '\n.cw PHYMO_ROCKS 3\n.cw 1212316161231 5\n```')
         if member and warns:
             user_id = member.id
             query = "SELECT * FROM warns WHERE user_id = $1"
@@ -444,8 +463,11 @@ class moderation(commands.Cog):
             if fetch:
                 query2 = "UPDATE warns SET warns = $1 WHERE user_id = $2"
                 await self.bot.pool.execute(query2, int(fetch[0]['warns']) - warns, user_id)
-                e3 = discord.Embed(color=main_color, description=f"**Successfully cleared {warns} warnings from {str(member)}.**\n"
-                                                                 f"**{str(member)} now has {(fetch[0]['warns'] - warns) if (fetch[0]['warns'] - warns) >= 0 else 0} warnings.**")
+                e3 = discord.Embed(color=main_color,
+                                   description=f"**Successfully cleared {warns} warnings from"
+                                               f" {str(member)}.**\n"
+                                               f"**{str(member)} now has "
+                                               f"{(fetch[0]['warns'] - warns) if (fetch[0]['warns'] - warns) >= 0 else 0} warnings.**")
                 return await ctx.send(embed=e3)
             if not fetch:
                 e2 = discord.Embed(color=main_color, title=f"{str(member)} has no warnings.")

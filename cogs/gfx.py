@@ -9,7 +9,7 @@ def setup(bot):
     bot.add_cog(gfx(bot))
 
 class gfx(commands.Cog):
-
+    """Command related to GFX (Graphical Effects/Graphic Designing)!"""
     def __init__(self, bot : commands.Bot):
         self.bot = bot
 

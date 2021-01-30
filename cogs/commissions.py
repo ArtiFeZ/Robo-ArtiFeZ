@@ -222,13 +222,12 @@ class Commissions(commands.Cog):
 
             query = "INSERT INTO profiles (user_id, socials, profession, portfolio, commissions_open, banner, registered_at, bio)" \
                     "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
-            await self.bot.pool.execute(query, ctx.author.id, socials, profession, portfolio, open, banner_url, datetime.datetime.utcnow(), bio)
+            await self.bot.pool.execute(query, str(ctx.author.id), socials, profession, portfolio, open, banner_url, datetime.datetime.utcnow(), bio)
             await banner_msg.add_reaction("✅")
             await ctx.message.add_reaction("✅")
             await channel.send(embed=qEmbed(title="Successfully registered your profile!",
                                             description="To view the profile, type `.profile`.\n"
                                                         "To edit the profile, type `.help set`."))
-
 
         except Exception as e:
             if isinstance(e, asyncio.TimeoutError):
