@@ -14,12 +14,42 @@ class Commissions(commands.Cog):
     """
     Commands related to the commission system in ArtiFeZ.
     """
+    """
+1st Part:
+**Registering your portfolio** (Seller Part)
+- every approved vfx/gfx will have the access to a `register` command on the server which will add his entry to a 
+sellers/artists list.
+
+- it will include questions like:
+drop your port
+your payment methods
+your minimum commission cost
+your best areas, maximum of 2, for example - headers and logos
+
+- once registered, there will be a channel named `verified-sellers` where they can use a command `portfolio`
+ which will show all their info which we asked in the questions. Then, we move onto our 2nd part.
+
+2nd Part:
+**Making a request** (Buyer part)
+- there will be a channel named `make-a-request` or something like that where people can use the `buy` or `request`
+command once in a day, where the buyer will be asked some questions like:
+your budget
+your available payment methods
+your order
+brief of your order (upto 2000 words)
+
+- this will create an open request from the buyer to all the available servers.
+This request will have a unique ID (like #0001)
+
+- Once they place their order,it gets sent to a channel named `requests` which only the verified sellers can access.
+The verified sellers then can dm the guy with their offers and the guy chooses the best one, when he
+finds the perfect guy, he marks his request by using a command `completed (unique id of request)`
+    """
     # Commands List: [all commands are guild-only]
     # Seller Part:
     # register : register the user  ✅
     # profile : view the profile of the user  ✅
     # set : set/change a value in the profile
-    # unset : remove the value from the profile
     # Buyer Part:
     # request : make a "request" from the buyers
     # requset edit <id> : edit a request already made
@@ -29,7 +59,8 @@ class Commissions(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def profileEmbed(self, data, user : discord.Member):
+    @staticmethod
+    def profileEmbed(data, user : discord.Member):
         # print(data)
         e = qEmbed(
             title=data["profession"],
@@ -45,7 +76,8 @@ class Commissions(commands.Cog):
         uh = '\n'
         if twitter or insta or twitter and insta:
             e.add_field(name="Socials",
-                        value=f"{f'[Twitter]({twitter})' if twitter else ''}{uh if insta else ''}{f'[Instagram]({insta})' if insta else ''}")
+                        value=f"{f'[Twitter]({twitter})' if twitter else ''}{uh if insta else ''}"
+                              f"{f'[Instagram]({insta})' if insta else ''}")
         e.description = data['bio']
         e.add_field(name="Commissions",
                     value="Open" if data['commissions_open'] else "Closed")
@@ -61,7 +93,7 @@ class Commissions(commands.Cog):
         seller = ctx.author if not seller else seller
         if not seller:
             query = "SELECT * FROM profiles WHERE user_id = $1"
-            data = await self.bot.pool.fetch(query, seller.id)
+            data = await self.bot.pool.fetch(query, str(seller.id))
             # print(data)
             if data:
                 e = self.profileEmbed(data[0], seller)
@@ -70,12 +102,92 @@ class Commissions(commands.Cog):
                 return await ctx.send(embed=qEmbed(title=f"{seller.display_name} is not a verified seller"))
         if seller:
             query = "SELECT * FROM profiles WHERE user_id = $1"
-            data = await self.bot.pool.fetch(query, seller.id)
+            data = await self.bot.pool.fetch(query, str(seller.id))
             if data:
                 e = self.profileEmbed(data[0], seller)
                 return await ctx.send(embed=e)
             if not data:
                 return await ctx.send(embed=qEmbed(title=f"{seller.display_name} is not a verified seller"))
+
+    @commands.command(name="set", help="Edits/Sets various values of your profile.")
+    @commands.has_role(ApprovedRoleID)
+    @commands.guild_only()
+    @commands.cooldown(1, 30, commands.BucketType.member)
+    async def _set(self, ctx: commands.Context, thing: str = None, *, value: str = None):
+        help_embed = qEmbed(title=f"❎ Incorrect usage")
+        help_embed.add_field(
+            name="Correct usage:",
+            value=f"`.set <thing> <value>`\n"
+                  f"`.set portfolio https://behance.net/vxdro`\n"
+                  f"`.set commissions closed`\n"
+                  f"`.set banner_url https://ibb.co/whatever`",
+            inline=False
+        ).add_field(
+            name="Available Options:",
+            value="bio\n"
+                  "profession\n"
+                  "twitter\n"
+                  "instagram\n",
+            inline=True
+        ).add_field(
+            name="⠀",
+            value="portfolio\n"
+                  "commissions\n"
+                  "banner"
+        )
+        if not thing:
+            return await ctx.send(embed=help_embed)
+        if not value:
+            return await ctx.send(embed=help_embed)
+        if thing and value:
+            user_id = str(ctx.author.id)
+            valid_things = ["bio", "profession", "twitter", "instagram", "portfolio", "commissions", "banner"]
+            if thing.lower() not in valid_things:
+                ee = help_embed
+                ee.title = "❎ Wrong thing entered!"
+                return await ctx.send(embed=ee)
+            if thing.lower() == "bio":
+                query = "UPDATE profiles SET bio = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query, value, user_id)
+                return await ctx.message.add_reaction("✅")
+            if thing.lower() == "profession":
+                query = "UPDATE profiles SET profession = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query, value, user_id)
+                return await ctx.message.add_reaction("✅")
+            if thing.lower() == "twitter":
+                data = await self.bot.pool.fetch("SELECT * from profiles WHERE user_id = $1", user_id)
+                socials = json.loads(data[0]["socials"])
+                socials["twitter"] = value
+                query = "UPDATE profiles SET socials = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query, json.dumps(socials), user_id)
+                return await ctx.message.add_reaction("✅")
+            if thing.lower() == "instagram":
+                data = await self.bot.pool.fetch("SELECT * from profiles WHERE user_id = $1", user_id)
+                socials = json.loads(data[0]["socials"])
+                socials["instagram"] = value
+                query = "UPDATE profiles SET socials = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query, json.dumps(socials), user_id)
+                return await ctx.message.add_reaction("✅")
+            if thing.lower() == "portfolio":
+                query = "UPDATE profiles SET portfolio = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query, value, user_id)
+                return await ctx.message.add_reaction("✅")
+            if thing.lower() == "commissions":
+                if "close" in value.lower():
+                    commissions_open = False
+                elif "open" in value.lower():
+                    commissions_open = True
+                else:
+                    commissions_open = False
+                query = "UPDATE profiles SET commissions_open = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query, commissions_open, user_id)
+                return await ctx.message.add_reaction("✅")
+            if thing.lower() == "banner":
+                query = "UPDATE profiles SET banner = $1 WHERE user_id = $2"
+                await self.bot.pool.execute(query, value, user_id)
+                return await ctx.message.add_reaction("✅")
+            else:
+                pass
 
     @commands.command(name="register", help="Registers you as a seller on the server.")
     @commands.has_role(ApprovedRoleID)
@@ -93,6 +205,12 @@ class Commissions(commands.Cog):
         banner : str
         registered_at : datetime
         """
+        check = await self.bot.pool.fetch("SELECT * FROM profiles WHERE user_id = $1", str(ctx.author.id))
+        if check:
+            return await ctx.send(embed=qEmbed(
+                title="Already Registered!",
+                description="You are already registered. You can type `.profile` to view your profile."
+            ))
         try:
             await ctx.message.add_reaction("✉")
             initial_msg = await ctx.author.send(embed=qEmbed(title="Starting the registering process",
@@ -231,15 +349,15 @@ class Commissions(commands.Cog):
 
         except Exception as e:
             if isinstance(e, asyncio.TimeoutError):
-                await ctx.send(embed=qEmbed(
+                await ctx.author.send(embed=qEmbed(
                     title="You did not answer in time!",
                     description="You can still retry by running the command again.",
-                    color=discord.Color.red()
+                    # color=discord.Color.red()
                 ))
             elif isinstance(e, discord.Forbidden):
                 await ctx.send(embed=qEmbed(
                     title="Please open your DMs and try again",
-                    color=discord.Color.red()
+                    # color=discord.Color.red()
                 ))
             else:
                 raise e
